@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Mic, MicOff, Play, Trash2, RefreshCw, FileImage, AlertTriangle, CheckCircle, Info, TrendingUp, Shield, Eye } from 'lucide-react';
+import { Upload, Mic, MicOff, Play, Trash2, RefreshCw, FileImage, AlertTriangle, CheckCircle, Info, TrendingUp, Shield, Eye, Zap, Brain, Target } from 'lucide-react';
 import '../styles/Analyzer.css';
 
 const Analyzer = () => {
@@ -9,6 +9,7 @@ const Analyzer = () => {
   const [isListening, setIsListening] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState(null);
+  const [expandedCard, setExpandedCard] = useState(null);
   const fileInputRef = useRef(null);
   const recognitionRef = useRef(null);
 
@@ -113,7 +114,12 @@ const Analyzer = () => {
   const clearAll = () => {
     setResults(null);
     setPrompt('');
+    setExpandedCard(null);
     removeImage({ preventDefault: () => {}, stopPropagation: () => {} });
+  };
+
+  const toggleCard = (cardId) => {
+    setExpandedCard(expandedCard === cardId ? null : cardId);
   };
 
   const analyzeContent = async () => {
@@ -123,16 +129,20 @@ const Analyzer = () => {
     }
 
     setIsAnalyzing(true);
+    setExpandedCard(null);
     
     // Simulate API call with realistic delay
     setTimeout(() => {
       const confidenceScore = Math.floor(Math.random() * 30) + 70;
       const riskLevel = ["Low", "Medium", "High"][Math.floor(Math.random() * 3)];
       const hasIssues = Math.random() > 0.4;
+      const processingTime = (Math.random() * 2 + 1).toFixed(1);
       
       setResults({
         confidenceScore,
         overallRisk: riskLevel,
+        processingTime,
+        elementsDetected: Math.floor(Math.random() * 15) + 8,
         contentAnalysis: {
           mainElements: [
             "Traditional cultural clothing and symbols",
@@ -140,83 +150,117 @@ const Analyzer = () => {
             "Facial expressions and body language",
             "Color schemes and artistic composition"
           ],
-          description: "Advanced AI analysis has identified multiple cultural and visual elements within the image. The system has processed visual patterns, symbolic representations, and contextual cues to provide comprehensive content assessment."
+          description: "Advanced AI analysis has identified multiple cultural and visual elements within the image. The system has processed visual patterns, symbolic representations, and contextual cues to provide comprehensive content assessment.",
+          tags: ["Cultural Content", "Visual Elements", "Symbolic Representation"]
         },
         riskAssessment: {
           level: riskLevel,
           hasIssues,
+          score: Math.floor(Math.random() * 40) + 60,
           explanation: hasIssues 
-            ? "The analysis has identified several elements that may contribute to cultural oversimplification or inappropriate representation. The content appears to rely on surface-level markers without providing deeper contextual understanding, potentially reinforcing stereotypes."
-            : "The content representation appears to be handled with appropriate sensitivity. The image demonstrates awareness of cultural nuance and avoids obvious problematic portrayals."
+            ? "The analysis has identified several elements that may contribute to cultural oversimplification or inappropriate representation."
+            : "The content representation appears to be handled with appropriate sensitivity and cultural awareness.",
+          categories: [
+            { name: "Cultural Sensitivity", score: Math.floor(Math.random() * 30) + 70, status: hasIssues ? "Warning" : "Clear" },
+            { name: "Stereotype Risk", score: Math.floor(Math.random() * 40) + 60, status: hasIssues ? "Medium" : "Low" },
+            { name: "Contextual Accuracy", score: Math.floor(Math.random() * 35) + 65, status: "Good" }
+          ]
         },
         culturalFindings: hasIssues ? [
-          "Oversimplified representation of cultural elements",
-          "Potential reinforcement of stereotypical patterns", 
-          "Limited contextual depth for authentic understanding",
-          "Risk of perpetuating cultural misconceptions",
-          "May contribute to reductive cultural narratives"
+          { type: "warning", text: "Oversimplified representation of cultural elements" },
+          { type: "warning", text: "Potential reinforcement of stereotypical patterns" },
+          { type: "info", text: "Limited contextual depth for authentic understanding" },
+          { type: "warning", text: "Risk of perpetuating cultural misconceptions" }
         ] : [
-          "Respectful portrayal of cultural elements",
-          "Appropriate contextual representation",
-          "Avoids obvious stereotypical markers",
-          "Demonstrates cultural awareness"
-        ]
+          { type: "success", text: "Respectful portrayal of cultural elements" },
+          { type: "success", text: "Appropriate contextual representation" },
+          { type: "success", text: "Avoids obvious stereotypical markers" },
+          { type: "info", text: "Demonstrates cultural awareness" }
+        ],
+        technicalDetails: {
+          imageSize: `${imageFile.width || 1920}x${imageFile.height || 1080}`,
+          fileSize: (imageFile.size / 1024 / 1024).toFixed(1),
+          format: imageFile.type?.split('/')[1]?.toUpperCase() || 'JPEG',
+          colorProfile: "sRGB"
+        }
       });
       setIsAnalyzing(false);
     }, 3000);
   };
 
-  // Icon Components
-  const UploadIcon = () => (
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M17 8L12 3L7 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M12 3V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  );
+  const getRiskColor = (level) => {
+    switch (level?.toLowerCase()) {
+      case 'low': return '#10b981';
+      case 'medium': return '#f59e0b';
+      case 'high': return '#ef4444';
+      default: return '#6b7280';
+    }
+  };
 
-  const MicIcon = ({ isActive }) => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 1C10.3431 1 9 2.34315 9 4V12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12V4C15 2.34315 13.6569 1 12 1Z" fill="currentColor"/>
-      <path d="M19 10V12C19 16.4183 15.4183 20 11 20V22H13C13.5523 22 14 22.4477 14 23C14 23.5523 13.5523 24 13 24H11C10.4477 24 10 23.5523 10 23C10 22.4477 10.4477 22 11 22V20C6.58172 20 3 16.4183 3 12V10C3 9.44772 3.44772 9 4 9C4.55228 9 5 9.44772 5 10V12C5 15.3137 7.68629 18 11 18H13C16.3137 18 19 15.3137 19 12V10C19 9.44772 19.4477 9 20 9C20.5523 9 21 9.44772 21 10V12C21 16.4183 17.4183 20 13 20V22H15C15.5523 22 16 22.4477 16 23C16 23.5523 15.5523 24 15 24H13C12.4477 24 12 23.5523 12 23C12 22.4477 12.4477 22 13 22V20C8.58172 20 5 16.4183 5 12V10C5 9.44772 5.44772 9 6 9C6.55228 9 7 9.44772 7 10V12C7 15.3137 9.68629 18 13 18C16.3137 18 19 15.3137 19 12V10Z" fill="currentColor"/>
-      {isActive && (
-        <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.3">
-          <animate attributeName="r" values="8;12;8" dur="1.5s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.3;0;0.3" dur="1.5s" repeatCount="indefinite" />
-        </circle>
-      )}
-    </svg>
-  );
+  const getStatusIcon = (type) => {
+    switch (type) {
+      case 'success': return '✅';
+      case 'warning': return '⚠️';
+      case 'error': return '❌';
+      default: return 'ℹ️';
+    }
+  };
 
   return (
-    <section className="analyzer-section">
+    <section id="analyzer" className="analyzer-section">
       <div className="analyzer-container">
-        {/* Header */}
+        {/* Enhanced Header */}
         <div className="analyzer-header">
           <div className="analyzer-badge">
-            <span>🔬</span>
+            <Brain size={16} />
             <span>AI-Powered Analysis</span>
+            <div className="badge-glow"></div>
           </div>
           
-          <h1 className="analyzer-title">Smart Image Analyzer</h1>
+          <h1 className="analyzer-title">
+            <span className="title-gradient">Smart Image Analyzer</span>
+            <div className="title-underline"></div>
+          </h1>
           
           <p className="analyzer-description">
             Upload any image and get comprehensive AI analysis for content detection, 
-            cultural sensitivity, and bias assessment using advanced machine learning.
+            cultural sensitivity, and bias assessment using advanced machine learning algorithms.
           </p>
+
+          <div className="feature-highlights">
+            <div className="feature-item">
+              <Zap size={16} />
+              <span>Real-time Analysis</span>
+            </div>
+            <div className="feature-item">
+              <Shield size={16} />
+              <span>Cultural Sensitivity</span>
+            </div>
+            <div className="feature-item">
+              <Target size={16} />
+              <span>Bias Detection</span>
+            </div>
+          </div>
         </div>
 
-        {/* Upload Section */}
+        {/* Enhanced Upload Section */}
         <div className="upload-section">
           <div className="upload-grid">
             {/* Image Upload Card */}
-            <div className="upload-card">
+            <div className="upload-card image-card">
               <div className="card-header">
-                <h3>
-                  <span>📸</span>
-                  Upload Image
-                </h3>
-                <p className="card-subtitle">Select an image for AI analysis</p>
+                <div className="header-content">
+                  <div className="card-icon">
+                    <FileImage size={20} />
+                  </div>
+                  <div>
+                    <h3>Upload Image</h3>
+                    <p className="card-subtitle">Select an image for AI analysis</p>
+                  </div>
+                </div>
+                <div className="card-status">
+                  {image ? <CheckCircle size={20} className="status-success" /> : <Upload size={20} className="status-pending" />}
+                </div>
               </div>
               
               <div 
@@ -236,14 +280,14 @@ const Analyzer = () => {
                           onClick={changeImage}
                           title="Change Image"
                         >
-                          🔄
+                          <RefreshCw size={16} />
                         </button>
                         <button 
                           className="action-btn remove-btn"
                           onClick={removeImage}
                           title="Remove Image"
                         >
-                          🗑️
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </div>
@@ -251,13 +295,20 @@ const Analyzer = () => {
                 ) : (
                   <div className="upload-placeholder">
                     <div className="upload-icon-container">
-                      <UploadIcon />
+                      <Upload size={32} />
+                      <div className="upload-pulse"></div>
                     </div>
                     <h4>Drag & drop or click to upload</h4>
-                    <p>JPG, PNG, GIF, WebP up to 10MB</p>
+                    <p>Supports JPG, PNG, GIF, WebP up to 10MB</p>
                     <div className="upload-features">
-                      <span className="feature-tag">✓ AI Analysis</span>
-                      <span className="feature-tag">✓ Fast Processing</span>
+                      <span className="feature-tag">
+                        <Zap size={12} />
+                        AI Analysis
+                      </span>
+                      <span className="feature-tag">
+                        <Brain size={12} />
+                        Smart Processing
+                      </span>
                     </div>
                   </div>
                 )}
@@ -273,25 +324,36 @@ const Analyzer = () => {
               {image && imageFile && (
                 <div className="upload-info">
                   <div className="upload-status">
-                    <span>✅</span>
-                    <span>Image ready for analysis</span>
+                    <CheckCircle size={16} />
+                    <span>Ready for analysis</span>
                   </div>
                   <div className="file-details">
-                    <span className="file-name">{imageFile.name}</span>
-                    <span className="file-size">{(imageFile.size / 1024 / 1024).toFixed(1)} MB</span>
+                    <div className="file-name">{imageFile.name}</div>
+                    <div className="file-meta">
+                      <span>{(imageFile.size / 1024 / 1024).toFixed(1)} MB</span>
+                      <span>•</span>
+                      <span>{imageFile.type?.split('/')[1]?.toUpperCase()}</span>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Prompt Input Card */}
+            {/* Enhanced Prompt Input Card */}
             <div className="upload-card prompt-card">
               <div className="card-header">
-                <h3>
-                  <span>💬</span>
-                  Analysis Prompt
-                </h3>
-                <p className="card-subtitle">Describe what you want to analyze</p>
+                <div className="header-content">
+                  <div className="card-icon">
+                    <Brain size={20} />
+                  </div>
+                  <div>
+                    <h3>Analysis Prompt</h3>
+                    <p className="card-subtitle">Describe what you want to analyze</p>
+                  </div>
+                </div>
+                <div className="card-status">
+                  {prompt.trim() ? <CheckCircle size={20} className="status-success" /> : <Info size={20} className="status-pending" />}
+                </div>
               </div>
               
               <div className="prompt-input-container">
@@ -310,7 +372,8 @@ const Analyzer = () => {
                       disabled={isAnalyzing}
                       title={isListening ? "Stop listening" : "Voice input"}
                     >
-                      {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+                      {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+                      {isListening && <div className="mic-pulse"></div>}
                     </button>
                   </div>
                 </div>
@@ -323,14 +386,14 @@ const Analyzer = () => {
                       <div className="wave"></div>
                       <div className="wave"></div>
                     </div>
-                    <span>Listening...</span>
+                    <span>Listening for input...</span>
                   </div>
                 )}
               </div>
               
               <div className="prompt-footer">
                 <div className="char-count">
-                  <span className={prompt.length > 600 ? 'warning' : ''}>{prompt.length}/800</span>
+                  <span className={prompt.length > 600 ? 'warning' : ''}>{prompt.length}/800 characters</span>
                 </div>
                 <div className="suggestion-tags">
                   <button 
@@ -350,7 +413,7 @@ const Analyzer = () => {
             </div>
           </div>
 
-          {/* Action Section */}
+          {/* Enhanced Action Section */}
           <div className="action-section">
             <div className="action-buttons">
               <button 
@@ -361,12 +424,12 @@ const Analyzer = () => {
                 {isAnalyzing ? (
                   <>
                     <div className="loading-spinner"></div>
-                    <span>Analyzing...</span>
+                    <span>Analyzing Image...</span>
                   </>
                 ) : (
                   <>
-                    <span>🔍</span>
-                    <span>Analyze Image</span>
+                    <Brain size={20} />
+                    <span>Start Analysis</span>
                   </>
                 )}
               </button>
@@ -377,137 +440,237 @@ const Analyzer = () => {
                   onClick={clearAll}
                   disabled={isAnalyzing}
                 >
-                  <span>🔄</span>
+                  <RefreshCw size={18} />
                   <span>Clear All</span>
                 </button>
               )}
             </div>
             
             <div className="analysis-note">
-              <span>💡</span>
-              <span>Advanced AI analyzes images for cultural sensitivity, bias, and inappropriate content</span>
+              <Info size={16} />
+              <span>Advanced AI technology for comprehensive image analysis and cultural sensitivity assessment</span>
             </div>
           </div>
         </div>
 
-        {/* Results Section */}
+        {/* Compact Results Section */}
         {results && (
           <div className="results-section">
             <div className="results-header">
-              <h3>📊 Analysis Results</h3>
-            </div>
-            
-            {/* Key Metrics */}
-            <div className="metrics-overview">
-              <div className="metric-card primary">
-                <div className="metric-icon">🎯</div>
-                <div className="metric-content">
-                  <h4>Confidence Score</h4>
-                  <div className="metric-value">{results.confidenceScore}%</div>
-                  <div className="metric-bar">
-                    <div 
-                      className="metric-fill" 
-                      style={{ width: `${results.confidenceScore}%` }}
-                    ></div>
-                  </div>
-                </div>
+              <div className="results-title">
+                <Target size={24} />
+                <h3>Analysis Complete</h3>
               </div>
-              
-              <div className="metric-card">
-                <div className="metric-icon">⚡</div>
-                <div className="metric-content">
-                  <h4>Risk Level</h4>
-                  <div className={`risk-badge risk-${results.overallRisk.toLowerCase()}`}>
-                    {results.overallRisk}
-                  </div>
+              <div className="results-summary">
+                <div className="summary-item">
+                  <span className="summary-label">Processed in</span>
+                  <span className="summary-value">{results.processingTime}s</span>
                 </div>
-              </div>
-              
-              <div className="metric-card">
-                <div className="metric-icon">🔍</div>
-                <div className="metric-content">
-                  <h4>Issues Status</h4>
-                  <div className={`status-badge ${results.riskAssessment.hasIssues ? 'detected' : 'clear'}`}>
-                    {results.riskAssessment.hasIssues ? 'Issues Found' : 'All Clear'}
-                  </div>
+                <div className="summary-item">
+                  <span className="summary-label">Elements detected</span>
+                  <span className="summary-value">{results.elementsDetected}</span>
                 </div>
               </div>
             </div>
             
-            {/* Detailed Results */}
-            <div className="results-grid">
-              {/* Content Analysis */}
-              <div className="result-card highlighted">
-                <div className="card-header">
-                  <div>
-                    <div className="card-icon">🔬</div>
-                    <h4>Content Analysis</h4>
-                  </div>
-                  <div className={`severity-indicator ${results.overallRisk.toLowerCase()}`}></div>
+            {/* Compact Key Metrics */}
+            <div className="metrics-compact">
+              <div className="metric-item primary">
+                <div className="metric-header">
+                  <TrendingUp size={18} />
+                  <span>Confidence</span>
                 </div>
-                <div className="analysis-content">
-                  <p>{results.contentAnalysis.description}</p>
-                  <div className="content-elements">
-                    <h5>Key Elements Identified:</h5>
-                    <ul className="elements-list">
-                      {results.contentAnalysis.mainElements.map((element, index) => (
-                        <li key={index}>
-                          <span className="element-marker">•</span>
-                          <span>{element}</span>
-                        </li>
+                <div className="metric-value-large">{results.confidenceScore}%</div>
+                <div className="metric-bar">
+                  <div 
+                    className="metric-fill" 
+                    style={{ width: `${results.confidenceScore}%` }}
+                  ></div>
+                </div>
+              </div>
+              
+              <div className="metric-item">
+                <div className="metric-header">
+                  <Shield size={18} />
+                  <span>Risk Level</span>
+                </div>
+                <div className={`risk-badge compact risk-${results.overallRisk.toLowerCase()}`}>
+                  {results.overallRisk}
+                </div>
+              </div>
+              
+              <div className="metric-item">
+                <div className="metric-header">
+                  <Eye size={18} />
+                  <span>Status</span>
+                </div>
+                <div className={`status-badge compact ${results.riskAssessment.hasIssues ? 'detected' : 'clear'}`}>
+                  {results.riskAssessment.hasIssues ? 'Issues Found' : 'All Clear'}
+                </div>
+              </div>
+            </div>
+            
+            {/* Compact Results Cards */}
+            <div className="results-compact">
+              {/* Content Analysis Card */}
+              <div className="result-card-compact">
+                <div className="card-compact-header" onClick={() => toggleCard('content')}>
+                  <div className="card-compact-title">
+                    <Brain size={18} />
+                    <span>Content Analysis</span>
+                    <div className="analysis-tags">
+                      {results.contentAnalysis.tags.map((tag, index) => (
+                        <span key={index} className="analysis-tag">{tag}</span>
                       ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Risk Assessment */}
-              <div className="result-card">
-                <div className="card-header">
-                  <div>
-                    <div className="card-icon">⚠️</div>
-                    <h4>Risk Assessment</h4>
-                  </div>
-                  <div className={`severity-indicator ${results.riskAssessment.level.toLowerCase()}`}></div>
-                </div>
-                <div className="analysis-content">
-                  <p>{results.riskAssessment.explanation}</p>
-                  <div className="content-tags">
-                    <span className={`content-tag severity-${results.riskAssessment.level.toLowerCase()}`}>
-                      Risk: {results.riskAssessment.level}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Cultural Findings */}
-              <div className="result-card full-width">
-                <div className="card-header">
-                  <div>
-                    <div className="card-icon">🌍</div>
-                    <h4>Key Findings</h4>
-                  </div>
-                  <div className="count-badge">{results.culturalFindings.length}</div>
-                </div>
-                <div className="findings-list">
-                  {results.culturalFindings.map((item, index) => (
-                    <div key={index} className="finding-item">
-                      <div className="finding-marker">
-                        {results.riskAssessment.hasIssues ? '⚠️' : '✅'}
-                      </div>
-                      <span>{item}</span>
                     </div>
-                  ))}
+                  </div>
+                  <div className="card-toggle">
+                    <div className={`toggle-icon ${expandedCard === 'content' ? 'expanded' : ''}`}>
+                      <TrendingUp size={16} />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="card-compact-preview">
+                  <p>{results.contentAnalysis.description.substring(0, 120)}...</p>
+                </div>
+                
+                {expandedCard === 'content' && (
+                  <div className="card-compact-details">
+                    <div className="content-elements-compact">
+                      <h5>Key Elements:</h5>
+                      <div className="elements-grid">
+                        {results.contentAnalysis.mainElements.map((element, index) => (
+                          <div key={index} className="element-chip">
+                            <span className="element-dot"></span>
+                            <span>{element}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Risk Assessment Card */}
+              <div className="result-card-compact">
+                <div className="card-compact-header" onClick={() => toggleCard('risk')}>
+                  <div className="card-compact-title">
+                    <Shield size={18} />
+                    <span>Risk Assessment</span>
+                    <div className="risk-score" style={{ color: getRiskColor(results.riskAssessment.level) }}>
+                      {results.riskAssessment.score}/100
+                    </div>
+                  </div>
+                  <div className="card-toggle">
+                    <div className={`toggle-icon ${expandedCard === 'risk' ? 'expanded' : ''}`}>
+                      <AlertTriangle size={16} />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="card-compact-preview">
+                  <p>{results.riskAssessment.explanation}</p>
+                </div>
+                
+                {expandedCard === 'risk' && (
+                  <div className="card-compact-details">
+                    <div className="risk-categories">
+                      {results.riskAssessment.categories.map((category, index) => (
+                        <div key={index} className="risk-category-item">
+                          <div className="category-info">
+                            <span className="category-name">{category.name}</span>
+                            <span className={`category-status status-${category.status.toLowerCase()}`}>
+                              {category.status}
+                            </span>
+                          </div>
+                          <div className="category-score">
+                            <div className="score-bar">
+                              <div 
+                                className="score-fill" 
+                                style={{ width: `${category.score}%` }}
+                              ></div>
+                            </div>
+                            <span>{category.score}%</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Cultural Findings Card */}
+              <div className="result-card-compact">
+                <div className="card-compact-header" onClick={() => toggleCard('findings')}>
+                  <div className="card-compact-title">
+                    <Eye size={18} />
+                    <span>Key Findings</span>
+                    <div className="findings-count">{results.culturalFindings.length}</div>
+                  </div>
+                  <div className="card-toggle">
+                    <div className={`toggle-icon ${expandedCard === 'findings' ? 'expanded' : ''}`}>
+                      <Info size={16} />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="card-compact-preview">
+                  <div className="findings-summary">
+                    {results.culturalFindings.slice(0, 2).map((finding, index) => (
+                      <div key={index} className="finding-preview">
+                        <span className="finding-icon">{getStatusIcon(finding.type)}</span>
+                        <span className="finding-text">{finding.text.substring(0, 50)}...</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                {expandedCard === 'findings' && (
+                  <div className="card-compact-details">
+                    <div className="findings-list-compact">
+                      {results.culturalFindings.map((finding, index) => (
+                        <div key={index} className={`finding-item-compact finding-${finding.type}`}>
+                          <div className="finding-marker">{getStatusIcon(finding.type)}</div>
+                          <span className="finding-text">{finding.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Technical Details Compact */}
+            <div className="technical-details-compact">
+              <h4>Technical Details</h4>
+              <div className="tech-grid">
+                <div className="tech-item">
+                  <span className="tech-label">Resolution</span>
+                  <span className="tech-value">{results.technicalDetails.imageSize}</span>
+                </div>
+                <div className="tech-item">
+                  <span className="tech-label">File Size</span>
+                  <span className="tech-value">{results.technicalDetails.fileSize} MB</span>
+                </div>
+                <div className="tech-item">
+                  <span className="tech-label">Format</span>
+                  <span className="tech-value">{results.technicalDetails.format}</span>
+                </div>
+                <div className="tech-item">
+                  <span className="tech-label">Color Profile</span>
+                  <span className="tech-value">{results.technicalDetails.colorProfile}</span>
                 </div>
               </div>
             </div>
             
-            {/* Disclaimer */}
-            <div className="disclaimer">
-              <div className="disclaimer-icon">ℹ️</div>
-              <div className="disclaimer-content">
-                <p><strong>Notice:</strong> This AI analysis provides preliminary assessment. For comprehensive evaluation, consult with relevant experts and community representatives.</p>
-              </div>
+            {/* Compact Disclaimer */}
+            <div className="disclaimer-compact">
+              <AlertTriangle size={16} />
+              <span>
+                <strong>Notice:</strong> This AI analysis provides preliminary assessment. 
+                For comprehensive evaluation, consult with relevant experts.
+              </span>
             </div>
           </div>
         )}
