@@ -96,10 +96,6 @@ const Home = () => {
                   <span className="stat-number">120+</span>
                   <span className="stat-label">Cultural Contexts</span>
                 </div>
-                <div className="stat">
-                  <span className="stat-number">5+</span>
-                  <span className="stat-label">Languages</span>
-                </div>
               </div>
             </div>
             
