@@ -37,23 +37,23 @@ const Team = () => {
       }
     },
     {
-      name: "Daksh Jain",
+      name: "Mrugank Patil",
       role: "BTech. Student, IIT Gandhinagar",
       image: "https://github.com/VenkatReddybathuni/UnityAI-guard-team-images/blob/main/DakshJain.png?raw=true",
       socialLinks: {
         linkedin: "https://www.linkedin.com/in/dkshjn/",
-        github: "https://dkshjn.github.io/portfolio/#header",
-        email: "mailto:daksh.jain@iitgn.ac.in"
+        github: "https://github.com/Mrugank97",
+        email: "mailto:mrugank.patil@iitgn.ac.in"
       }
     },
     {
-      name: "Venkat Reddybathuni",
+      name: "Omkar Rajeev Prabhu",
       role: "BTech. Student, IIT Gandhinagar",
       image: "https://github.com/VenkatReddybathuni/UnityAI-guard-team-images/blob/main/ReddybathuniVenkat.png?raw=true",
       socialLinks: {
         linkedin: "https://www.linkedin.com/in/reddybathuni-venkat-158364261/",
         github: "https://github.com/VenkatReddybathuni",
-        email: "mailto:reddybathuni.venkat@iitgn.ac.in"
+        email: "mailto:omkar.prabhu@iitgn.ac.in"
       }
     }
   ];
