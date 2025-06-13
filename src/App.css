@@ -1126,3 +1126,11 @@ body, html {
     font-size: 1rem;
   }
 }
+.contact-section {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+.contact-section::after {
+  display: none !important;
+}
+
