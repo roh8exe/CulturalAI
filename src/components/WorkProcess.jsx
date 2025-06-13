@@ -24,7 +24,7 @@ const WorkProcess = () => {
   ];
 
   return (
-    <section className="work-process-section">
+    <section id="work-process" className="work-process-section">
       <div className="section-container work-process-container">
         <h2 className="section-title work-process-title">How It Works</h2>
         

@@ -59,7 +59,7 @@ const Team = () => {
   ];
 
   return (
-    <section className="team-section">
+    <section id="team" className="team-section">
       <div className="team-container">
         <h2 className="team-title">Our Team</h2>
         <p className="team-subtitle">
