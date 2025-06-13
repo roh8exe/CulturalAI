@@ -1,0 +1,228 @@
+/* About.css */
+
+.about-section {
+  background: linear-gradient(to bottom, white, #f8fafc);
+  min-height: 100vh;
+  padding: 120px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(0, 123, 255, 0.04) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(102, 16, 242, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.about-section h1 {
+  text-align: center;
+  font-size: 2.75rem;
+  font-weight: 800;
+  margin-bottom: 4rem;
+  color: var(--text-primary, #212529);
+  letter-spacing: -0.02em;
+  position: relative;
+  z-index: 2;
+}
+
+.about-section h1::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 4px;
+  width: 80px;
+  background: linear-gradient(90deg, var(--primary-color, #007bff), var(--secondary-color, #6610f2));
+  border-radius: 2px;
+}
+
+.about-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.about-box {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05), 0 5px 15px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(230, 230, 230, 0.6);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  animation: slideInUp 0.6s ease-out;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.about-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--primary-color, #007bff), var(--secondary-color, #6610f2));
+  border-radius: 20px 20px 0 0;
+}
+
+.about-box::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--primary-color, #007bff), var(--secondary-color, #6610f2));
+  border-radius: 0 4px 4px 0;
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.about-box:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 123, 255, 0.12);
+  border-color: rgba(0, 123, 255, 0.3);
+}
+
+.about-box:hover::after {
+  transform: scaleY(1);
+}
+
+.about-box h2 {
+  color: var(--primary-color, #007bff);
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  position: relative;
+  padding-left: 1.75rem;
+}
+
+.about-box h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.875rem;
+  height: 0.875rem;
+  background: linear-gradient(135deg, var(--primary-color, #007bff), var(--secondary-color, #6610f2));
+  border-radius: 50%;
+}
+
+.about-box p {
+  line-height: 1.7;
+  color: var(--text-secondary, #6c757d);
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0;
+  flex-grow: 1;
+}
+
+/* Animation delays for staggered appearance */
+.about-box:nth-child(1) { animation-delay: 0.1s; }
+.about-box:nth-child(2) { animation-delay: 0.2s; }
+.about-box:nth-child(3) { animation-delay: 0.3s; }
+
+/* Keyframe Animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .about-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .about-box {
+    padding: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-section {
+    padding: 80px 0;
+  }
+  
+  .about-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+  }
+  
+  .about-content {
+    gap: 1.5rem;
+  }
+  
+  .about-box {
+    padding: 2rem;
+  }
+  
+  .about-box h2 {
+    font-size: 1.375rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .about-box p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 640px) {
+  .about-section {
+    padding: 60px 0;
+  }
+  
+  .about-section h1 {
+    font-size: 2.25rem;
+    margin-bottom: 2.5rem;
+  }
+  
+  .about-box {
+    padding: 1.75rem;
+  }
+  
+  .about-box h2 {
+    font-size: 1.25rem;
+    padding-left: 1.5rem;
+  }
+  
+  .about-box h2::before {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+  
+  .about-box p {
+    font-size: 0.9rem;
+  }
+}
